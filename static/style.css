@@ -1,0 +1,371 @@
+/* ===================================================================
+   ReviewLens — style.css
+   Notion / Medium inspired · clean, minimal, human-designed
+   =================================================================== */
+
+/* ─── Reset & Base ─────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+                 Roboto, Helvetica, Arial, sans-serif;
+    background: #f8f7f4;          /* warm off-white */
+    color: #1a1a1a;
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Header ───────────────────────────────────────────────────────── */
+#site-header {
+    text-align: center;
+    padding: 3.5rem 1rem 2rem;
+}
+
+#site-header .logo-mark {
+    font-size: 2rem;
+    margin-bottom: 0.35rem;
+    color: #e06c4f;
+    letter-spacing: -1px;
+}
+
+#site-header h1 {
+    font-size: 2.25rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: #1a1a1a;
+}
+
+#site-header .subtitle {
+    margin-top: 0.3rem;
+    font-size: 1.05rem;
+    color: #6b6b6b;
+    font-weight: 400;
+}
+
+/* ─── Main Container ──────────────────────────────────────────────── */
+#app {
+    max-width: 720px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 1.25rem 3rem;
+    flex: 1;
+}
+
+/* ─── Card ─────────────────────────────────────────────────────────── */
+.card {
+    background: #ffffff;
+    border: 1px solid #e8e5e0;
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+/* ─── Input Section ────────────────────────────────────────────────── */
+.input-label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: #888;
+    margin-bottom: 0.65rem;
+}
+
+#review-input {
+    width: 100%;
+    border: 1.5px solid #ddd8d0;
+    border-radius: 8px;
+    padding: 1rem 1.15rem;
+    font-family: inherit;
+    font-size: 1rem;
+    color: #1a1a1a;
+    background: #fdfcfa;
+    resize: vertical;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#review-input:focus {
+    outline: none;
+    border-color: #e06c4f;
+    box-shadow: 0 0 0 3px rgba(224, 108, 79, 0.12);
+}
+
+#review-input::placeholder {
+    color: #b5b0a8;
+}
+
+/* ─── Analyze Button ───────────────────────────────────────────────── */
+#analyze-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1.15rem;
+    padding: 0.72rem 1.6rem;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #fff;
+    background: #1a1a1a;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.15s ease;
+}
+
+#analyze-btn:hover {
+    background: #333;
+    transform: translateY(-1px);
+}
+
+#analyze-btn:active {
+    transform: translateY(0);
+}
+
+#analyze-btn.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.btn-icon {
+    font-size: 1.1rem;
+    transition: transform 0.2s ease;
+}
+
+#analyze-btn:hover .btn-icon {
+    transform: translateX(3px);
+}
+
+/* ─── Loader ───────────────────────────────────────────────────────── */
+#loader {
+    text-align: center;
+    padding: 2rem 0;
+    color: #888;
+    font-size: 0.95rem;
+}
+
+.spinner {
+    width: 28px;
+    height: 28px;
+    border: 3px solid #e0ddd7;
+    border-top-color: #e06c4f;
+    border-radius: 50%;
+    margin: 0 auto 0.75rem;
+    animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ─── Error Banner ─────────────────────────────────────────────────── */
+#error-msg {
+    background: #fef2f0;
+    color: #c0392b;
+    border: 1px solid #f5c6cb;
+    border-radius: 8px;
+    padding: 0.85rem 1.2rem;
+    font-size: 0.92rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+/* ─── Hidden Utility ───────────────────────────────────────────────── */
+.hidden {
+    display: none !important;
+}
+
+/* ─── Results Section ──────────────────────────────────────────────── */
+#results-section {
+    animation: fadeUp 0.45s ease;
+}
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Stats Row ─────────────────────────────────────────────────────── */
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.stat-card {
+    background: #fff;
+    border: 1px solid #e8e5e0;
+    border-radius: 10px;
+    padding: 1.25rem 1rem;
+    text-align: center;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.stat-card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+    transform: translateY(-2px);
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    color: #999;
+    margin-bottom: 0.45rem;
+}
+
+.stat-value {
+    display: block;
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+/* Sentiment colours */
+.stat-value.positive { color: #27ae60; }
+.stat-value.negative { color: #c0392b; }
+.stat-value.mixed    { color: #e6a117; }
+
+/* Verdict colours */
+.verdict-recommended     { color: #27ae60; }
+.verdict-moderate        { color: #e6a117; }
+.verdict-not-recommended { color: #c0392b; }
+
+/* ── Sentiment Breakdown (Positive % / Negative %) ─────────────────── */
+.sentiment-breakdown {
+    background: #fff;
+    border: 1px solid #e8e5e0;
+    border-radius: 10px;
+    padding: 1.1rem 1.25rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+}
+
+.breakdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.breakdown-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    min-width: 68px;
+}
+
+.breakdown-label.positive { color: #27ae60; }
+.breakdown-label.negative { color: #c0392b; }
+
+.breakdown-track {
+    flex: 1;
+    height: 8px;
+    background: #edeae5;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.breakdown-fill {
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.6s ease;
+}
+
+.positive-fill { background: #27ae60; }
+.negative-fill { background: #c0392b; }
+
+.breakdown-pct {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #555;
+    min-width: 48px;
+    text-align: right;
+}
+
+/* ── Pros & Cons Grid ──────────────────────────────────────────────── */
+.pros-cons-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.pc-col {
+    background: #fff;
+    border: 1px solid #e8e5e0;
+    border-radius: 10px;
+    padding: 1.35rem 1.25rem;
+}
+
+.pc-heading {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.pros-heading { color: #27ae60; }
+.cons-heading { color: #c0392b; }
+
+.pc-col ul {
+    list-style: none;
+    padding: 0;
+}
+
+.pc-col ul li {
+    position: relative;
+    padding: 0.45rem 0 0.45rem 1.1rem;
+    font-size: 0.93rem;
+    color: #444;
+    line-height: 1.5;
+}
+
+.pros-col ul li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: #27ae60;
+    font-weight: 700;
+}
+
+.cons-col ul li::before {
+    content: "✗";
+    position: absolute;
+    left: 0;
+    color: #c0392b;
+    font-weight: 700;
+}
+
+/* ─── Footer ───────────────────────────────────────────────────────── */
+#site-footer {
+    text-align: center;
+    padding: 2rem 1rem;
+    font-size: 0.8rem;
+    color: #aaa;
+    border-top: 1px solid #eae7e2;
+}
+
+/* ─── Responsive ───────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+    #site-header h1 { font-size: 1.65rem; }
+    .stats-row { grid-template-columns: 1fr; }
+    .pros-cons-grid { grid-template-columns: 1fr; }
+    .card { padding: 1.25rem; }
+}

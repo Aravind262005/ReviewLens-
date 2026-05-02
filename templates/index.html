@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="ReviewLens — Paste any product review and instantly see sentiment, pros, cons, score, and a clear verdict." />
+    <title>ReviewLens · Product Insight Analyzer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <!-- Clean sans-serif from Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+    <!-- ─── Header ───────────────────────────────────────────────── -->
+    <header id="site-header">
+        <div class="logo-mark">◉</div>
+        <h1>ReviewLens</h1>
+        <p class="subtitle">Turn reviews into clear insights</p>
+    </header>
+
+    <!-- ─── Main Container ───────────────────────────────────────── -->
+    <main id="app">
+
+        <!-- Input Section -->
+        <section id="input-section" class="card">
+            <label for="review-input" class="input-label">Paste a product review</label>
+            <textarea
+                id="review-input"
+                rows="6"
+                placeholder="e.g. The battery life is amazing, but the screen could be brighter. Overall a solid phone for the price…"
+            ></textarea>
+            <button id="analyze-btn" onclick="analyzeReview()">
+                <span class="btn-text">Analyze</span>
+                <span class="btn-icon">→</span>
+            </button>
+        </section>
+
+        <!-- Loading Indicator (hidden by default) -->
+        <div id="loader" class="hidden">
+            <div class="spinner"></div>
+            <p>Analyzing your review…</p>
+        </div>
+
+        <!-- Error message -->
+        <div id="error-msg" class="hidden"></div>
+
+        <!-- ─── Results Section (hidden until analysis runs) ──── -->
+        <section id="results-section" class="hidden">
+
+            <!-- Top stats -->
+            <div class="stats-row">
+                <div class="stat-card" id="stat-sentiment">
+                    <span class="stat-label">Sentiment</span>
+                    <span class="stat-value" id="val-sentiment">—</span>
+                </div>
+                <div class="stat-card" id="stat-score">
+                    <span class="stat-label">Score</span>
+                    <span class="stat-value" id="val-score">—</span>
+                </div>
+                <div class="stat-card" id="stat-verdict">
+                    <span class="stat-label">Verdict</span>
+                    <span class="stat-value" id="val-verdict">—</span>
+                </div>
+            </div>
+
+            <!-- Sentiment Breakdown (Positive % / Negative %) -->
+            <div class="sentiment-breakdown">
+                <div class="breakdown-item">
+                    <span class="breakdown-label positive">Positive</span>
+                    <div class="breakdown-track">
+                        <div class="breakdown-fill positive-fill" id="positive-bar" style="width:0%"></div>
+                    </div>
+                    <span class="breakdown-pct" id="positive-pct">0 %</span>
+                </div>
+                <div class="breakdown-item">
+                    <span class="breakdown-label negative">Negative</span>
+                    <div class="breakdown-track">
+                        <div class="breakdown-fill negative-fill" id="negative-bar" style="width:0%"></div>
+                    </div>
+                    <span class="breakdown-pct" id="negative-pct">0 %</span>
+                </div>
+            </div>
+
+            <!-- Pros & Cons columns -->
+            <div class="pros-cons-grid">
+                <div class="pc-col pros-col">
+                    <h3 class="pc-heading pros-heading">✔ Pros</h3>
+                    <ul id="pros-list"></ul>
+                </div>
+                <div class="pc-col cons-col">
+                    <h3 class="pc-heading cons-heading">✖ Cons</h3>
+                    <ul id="cons-list"></ul>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- ─── Footer ───────────────────────────────────────────────── -->
+    <footer id="site-footer">
+        <p>Built with Flask &amp; scikit-learn · ReviewLens © 2026</p>
+    </footer>
+
+    <!-- ─── Script ───────────────────────────────────────────────── -->
+    <script>
+        /**
+         * Send the review text to the Flask /predict endpoint via fetch,
+         * then populate the results section with the returned data.
+         */
+        async function analyzeReview() {
+            const textarea  = document.getElementById("review-input");
+            const loader    = document.getElementById("loader");
+            const results   = document.getElementById("results-section");
+            const errorMsg  = document.getElementById("error-msg");
+            const btn       = document.getElementById("analyze-btn");
+
+            const review = textarea.value.trim();
+
+            // Hide previous results / errors
+            results.classList.add("hidden");
+            errorMsg.classList.add("hidden");
+
+            if (!review) {
+                showError("Please paste a review before clicking Analyze.");
+                return;
+            }
+
+            // Show loading state
+            loader.classList.remove("hidden");
+            btn.disabled = true;
+            btn.classList.add("loading");
+
+            try {
+                const response = await fetch("/predict", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ review }),
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    showError(data.error || "Something went wrong.");
+                    return;
+                }
+
+                // ── Populate results ──────────────────────────────────
+                populateResults(data);
+                results.classList.remove("hidden");
+
+                // Smooth scroll to results
+                results.scrollIntoView({ behavior: "smooth", block: "start" });
+
+            } catch (err) {
+                showError("Network error — is the server running?");
+                console.error(err);
+            } finally {
+                loader.classList.add("hidden");
+                btn.disabled = false;
+                btn.classList.remove("loading");
+            }
+        }
+
+        /**
+         * Fill the DOM with analysis results.
+         */
+        function populateResults(data) {
+            // Sentiment
+            const sentEl = document.getElementById("val-sentiment");
+            sentEl.textContent = data.sentiment;
+            // Handle three states: Positive, Negative, Mixed
+            if (data.sentiment === "Positive") {
+                sentEl.className = "stat-value positive";
+            } else if (data.sentiment === "Negative") {
+                sentEl.className = "stat-value negative";
+            } else {
+                sentEl.className = "stat-value mixed";
+            }
+
+            // Score (stars)
+            const scoreEl = document.getElementById("val-score");
+            scoreEl.textContent = "★".repeat(data.score) + "☆".repeat(5 - data.score);
+
+            // Verdict
+            const verdictEl = document.getElementById("val-verdict");
+            verdictEl.textContent = data.verdict;
+            verdictEl.className = "stat-value verdict-" + data.verdict.toLowerCase().replace(/\s+/g, "-");
+
+            // Sentiment breakdown bars (Positive % / Negative %)
+            const posBar = document.getElementById("positive-bar");
+            const posPct = document.getElementById("positive-pct");
+            posBar.style.width = data.positive_pct + "%";
+            posPct.textContent = data.positive_pct + " %";
+
+            const negBar = document.getElementById("negative-bar");
+            const negPct = document.getElementById("negative-pct");
+            negBar.style.width = data.negative_pct + "%";
+            negPct.textContent = data.negative_pct + " %";
+
+            // Pros
+            const prosList = document.getElementById("pros-list");
+            prosList.innerHTML = "";
+            data.pros.forEach(function (item) {
+                const li = document.createElement("li");
+                li.textContent = item;
+                prosList.appendChild(li);
+            });
+
+            // Cons
+            const consList = document.getElementById("cons-list");
+            consList.innerHTML = "";
+            data.cons.forEach(function (item) {
+                const li = document.createElement("li");
+                li.textContent = item;
+                consList.appendChild(li);
+            });
+        }
+
+        /**
+         * Display a user-visible error banner.
+         */
+        function showError(msg) {
+            const el = document.getElementById("error-msg");
+            el.textContent = msg;
+            el.classList.remove("hidden");
+        }
+
+        /* Allow Ctrl+Enter to submit */
+        document.getElementById("review-input").addEventListener("keydown", function (e) {
+            if (e.ctrlKey && e.key === "Enter") {
+                analyzeReview();
+            }
+        });
+    </script>
+</body>
+</html>
