@@ -17,11 +17,11 @@ ReviewLens is a sophisticated, industry-grade web application designed to transf
 ## 📸 Screenshots
 
 ### 1. Main Dashboard
-[![ReviewLens Dashboard](screenshots/dashboard.png)](screenshots/dashboard.png)
+[![ReviewLens Dashboard](screenshots/Dashboard.png)](screenshots/Dashboard.png)
 *The clean, minimal entry point for review analysis.*
 
 ### 2. Detailed Analysis Results
-[![ReviewLens Analysis](screenshots/results.png)](screenshots/results.png)
+[![ReviewLens Analysis](screenshots/Results1.png)](screenshots/Results2.png)
 *Showing sentiment ratios, scores, and extracted pros/cons.*
 
 ---
