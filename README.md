@@ -17,7 +17,7 @@ ReviewLens is a sophisticated, industry-grade web application designed to transf
 ## 📸 Screenshots
 
 ### 1. Main Dashboard
-![ReviewLens Dashboard](<img width="1898" height="852" alt="ReviewLens Main" src="https://github.com/user-attachments/assets/fa0b7f1f-5b99-41b1-bf9b-69756ab42cda" />
+![ReviewLens Dashboard]
 )
 *The clean, minimal entry point for review analysis.*
 
